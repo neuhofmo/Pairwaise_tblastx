@@ -1,11 +1,13 @@
 #! /usr/bin/env python2
 
-from RecBlastUtils import debug_s, create_folder_if_needed, write_run_script
 import argparse
-from Bio import SeqIO
 import os
-from time import strftime, sleep
 import subprocess
+from time import strftime, sleep
+
+from Bio import SeqIO
+
+from RecBlastUtils import debug_s, create_folder_if_needed, write_run_script, exists_not_empty
 
 # THIS PROGRAM RECEIVES A FOLDER CONTAINING FASTA FILES,
 # PERFORMS TBLASTX BETWEEN DIFFERENT COMBINATIONS OF THE FILES (NON-REDUNDANT)
@@ -241,6 +243,8 @@ for i in range(num_fastas):  # first loop - query file
         full_path_db = join_folder(fasta_folder, query_db_tuple[1])
         if args.skip_blast:
             print "Skipping blast run. Using output from {}".format(blast_out_fname)
+        elif exists_not_empty(blast_out_fname):
+            print "Output file exists and not empty. Skipping blast run. Using output from {}".format(blast_out_fname)
         else:
             if run_tblastx(full_path_query, full_path_db, OUTFMT, E_VALUE_THRESH, COVERAGE_THRESHOLD, CPU,
                            blast_out_fname):
